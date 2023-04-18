@@ -4,8 +4,8 @@ sampleTime = 0.01; % Simulation Sample time in seconds
 
 %Platform charasteristics:
 GearRatio = 75;
-WheelRadius=7.5/2/100;
-Robot_L=36/100;
+WheelRadius=37.5/2/1000;    % [m]
+Robot_L=98/1000;            % [m]
 
 %Motor parameters:
 %Max rotation velocity of a wheel w[rad/sec]=2*pi*w[rotation/sec]
