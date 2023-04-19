@@ -7,15 +7,13 @@ GearRatio = 75;
 WheelRadius=37.5/2/1000;    % [m]
 Robot_L=98/1000;            % [m]
 
-%Motor parameters:
-%Max rotation velocity of a wheel w[rad/sec]=2*pi*w[rotation/sec]
-w_Max=33000/60*2*pi; %[rad/sec] %motor datasheet 33000 rotation/minute
-%w_Max=12000;
-v_Max=w_Max/GearRatio*WheelRadius; %[m/s] %V=2*pi*w (w -  rotation/sec)
-%Max acceleration
-a_Max=1; %[m/s^2]
-%Max rotation acceleration
-wdot_Max=a_Max*GearRatio/WheelRadius; %[rad/sec^2]
+%Max linear acceleration / Velocity
+a_Max = 1; %[m/s^2]
+v_Max = 1; %[m/s]
+
+%Max Wheels acceleration / Velocity
+wdot_Max=a_Max/(WheelRadius*2*pi); %[rad/sec^2] a=2*pi*r*w_dot (w -  rotation/sec)
+w_Max=v_Max/(WheelRadius*2*pi); %[rad/sec^2] V=2*pi*r*w (w -  rotation/sec)
 
 % Initial State variables:
 Phi_Init=0;
