@@ -30,6 +30,9 @@ class ZumoApp:
         self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
         self.create_layout()
 
+        self.file = open('recorded_messages.txt', 'a')
+
+
     def start(self):
         self.transmit_thread.start()
         self.receive_thread.start()
@@ -54,6 +57,7 @@ class ZumoApp:
                     if len(self.last_messages) > 3:
                         self.last_messages.pop(0)
                 print(c)
+                self.file.write(c)  # write to the file
             else:
                 time.sleep(0.05)
 
@@ -130,8 +134,9 @@ class ZumoApp:
             )
         }
 
-    def close(self):
+    def close(self): 
         self.closing_event.set()
+        self.file.close()
 
     def close_button_clicked(self, n_clicks):
         if n_clicks is not None and n_clicks > 0:
