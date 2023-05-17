@@ -8,8 +8,8 @@ WheelRadius=37.5/2/1000;    % [m]
 Robot_L=98/1000;            % [m]
 
 %Max linear acceleration / Velocity
-a_Max = 1; %[m/s^2]
-v_Max = 1; %[m/s]
+a_Max = 1/4; %[m/s^2]
+v_Max = 1/2; %[m/s]
 
 %Max Wheels acceleration / Velocity
 wdot_Max=a_Max/(WheelRadius*2*pi); %[rad/sec^2] a=2*pi*r*w_dot (w -  rotation/sec)
