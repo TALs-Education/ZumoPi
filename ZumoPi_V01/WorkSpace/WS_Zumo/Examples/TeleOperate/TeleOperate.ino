@@ -5,7 +5,6 @@
 #include <Zumo32U4.h>
 
 Zumo32U4Motors motors;
-Zumo32U4Encoders encoders;
 
 int i = 0;
 String inputString = "";         // a String to hold incoming data
@@ -49,8 +48,7 @@ void loop() {
     str ="";
     str = inputString.substring(ind1+1);   //captures first data String
     int joyY = str.toInt();
-    int16_t countsLeft = encoders.getCountsLeft();
-    int16_t countsRight = encoders.getCountsRight();
+    
     int leftMotor = joyY + joyX;  //int(float(joyX)/1.5);
     int rightMotor = joyY - joyX; //int(float(joyX)/1.5);
     uint16_t batteryLevel = readBatteryMillivolts();
@@ -59,11 +57,7 @@ void loop() {
     Serial.print(" , ");
     Serial.print(rightMotor);
     Serial.print(" , ");
-    Serial.print(battery);
-    Serial.print(" , ");
-    Serial.print(countsLeft);
-    Serial.print(" , ");
-    Serial.println(countsRight);    
+    Serial.println(battery);
     motors.setLeftSpeed(leftMotor);
     motors.setRightSpeed(rightMotor);
     // clear the string:
