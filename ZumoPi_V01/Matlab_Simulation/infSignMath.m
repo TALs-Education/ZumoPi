@@ -5,9 +5,9 @@ X = cos(t)*0.5;
 Y = cos(t).*sin(t)*0.5;
 
 plot(X,Y)
-hold on
-plot(X,Y,'.')
-hold off
+% hold on
+% plot(X,Y,'.')
+% hold off
 
 % calculate pendicular vector and add the pen offset
 Xdot = -sin(t);
