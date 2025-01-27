@@ -1,0 +1,10 @@
+UPS - Geekworm X1200 - https://geekworm.com/products/x1200
+https://suptronics.com/Raspberrypi/Power_mgmt/x120x-v1.0_software.html
+
+arduino ide ARM 64 version 1.89
+https://www.arduino.cc/en/software
+
+Zumo-arduino Arduino Mbed OS RP2040 Boards 
+https://github.com/adamgreen/pololu-3pi-plus-2040-arduino-library
+
+add arduino cli
