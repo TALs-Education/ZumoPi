@@ -112,4 +112,8 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# export PATH=$PATH:/home/pi/bin
+export PATH=$PATH:/home/pi/bin
+
+# by default activate zumoPy venv
+source zumoPy/bin/activate
+

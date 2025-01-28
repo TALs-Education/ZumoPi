@@ -17,17 +17,40 @@ install arduino-cli  	https://siytek.com/arduino-cli-raspberry-pi/
 setup arduino cores:
 $arduino-cli core install arduino:avr
 
-work with virtualenv:
-$virtualenv -p python venv_test
+work with virtualenv: https://learn.adafruit.com/python-virtual-environment-usage-on-raspberry-pi/overview
+$sudo apt install python3-venv
+$python3 -m venv zumoPy
+
+activate enviroment
+$source zumoPy/bin/activate
+
+deactivate enviroment
+$deactivate
+
+Backup enviroment:
+$pip freeze > requirements.txt
+
+Update enviroment
+$pip install -r requirements.txt
 
 upgrade python-pip
-$python -m pip install --upgrade pip
+$python3 -m pip install --upgrade pip
 
 python packages:
 $pip install dash
 $pip install evdev
-$pip3 install pyserial
+$pip install pyserial
 $pip install dash-daq
+
+#legacy camera setup
+&sudo apt install python3-picamzero
+
+
+&pip install picamera
+&pip install --upgrade picamera[array]
+
+install i2ctools
+https://snapcraft.io/install/i2ctools/raspbian
 
 Setup pi UPS: https://wiki.geekworm.com/X728
 $git clone https://github.com/geekworm-com/x728
