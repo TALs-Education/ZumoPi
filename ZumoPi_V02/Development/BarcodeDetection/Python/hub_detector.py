@@ -38,22 +38,16 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
     gray_img_original = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     
     # --- 2. Create a grayscale mask based on the blue gradient ---
-    # Convert channels to float32 for computation.
     R = img[:, :, 0].astype(np.float32)
     G = img[:, :, 1].astype(np.float32)
     B = img[:, :, 2].astype(np.float32)
-    # Compute maximum of red and green channels.
     max_RG = np.maximum(R, G)
-    # Compute blue gradient (only positive differences).
     blue_grad = B - max_RG
     blue_grad = np.where(blue_grad < 0, 0, blue_grad)
-    # Normalize in-place using a preallocated array.
     norm_blue = np.empty_like(blue_grad)
     cv2.normalize(blue_grad, norm_blue, 0, 255, cv2.NORM_MINMAX)
     blue_mask = norm_blue.astype(np.uint8)
-    # Invert to get non-blue mask (vectorized operation).
     non_blue_mask = 255 - blue_mask
-    # Compute normalized version in-place.
     non_blue_norm = non_blue_mask.astype(np.float32)
     non_blue_norm /= 255.0
     
@@ -69,7 +63,6 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
     min_radius = int(np.floor((circle_diameter * 0.75) / 2))
     max_radius = int(np.floor((circle_diameter * 1.25) / 2))
     
-    # Updated HoughCircles parameters (param1=100, param2=30) for more complete circles.
     circles = cv2.HoughCircles(non_blue_blur, cv2.HOUGH_GRADIENT, dp=1, 
                                minDist=circle_diameter,
                                param1=100, param2=30,
@@ -93,7 +86,7 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
     lower_dark = expected_dark_fraction * 0.75
     upper_dark = expected_dark_fraction * 1.25
     
-    # --- Precompute coordinate grids once ---
+    # --- Precompute coordinate grid once ---
     rows, cols = non_blue_norm.shape
     y_grid, x_grid = np.ogrid[0:rows, 0:cols]
     
@@ -101,26 +94,26 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
     if circles is not None:
         for (c_x, c_y, r) in circles[0, :]:
             c_x, c_y, r = int(c_x), int(c_y), int(r)
-            # Create a circular mask using the precomputed grids.
             circle_mask = (x_grid - c_x)**2 + (y_grid - c_y)**2 <= r**2
-            # Compute the average non-blue intensity ("dark fraction") vectorized.
             dark_fraction = np.mean(non_blue_norm[circle_mask])
             
             if lower_dark <= dark_fraction <= upper_dark:
-                # --- 5. Analyze blobs inside the candidate hub using the original grayscale image ---
+                # --- 5. Analyze blobs inside the candidate hub on the original grayscale image ---
                 local_gray = cv2.bitwise_and(gray_img_original, gray_img_original,
                                                mask=(circle_mask.astype(np.uint8) * 255))
                 ret, local_bin = cv2.threshold(local_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
                 
-                # Find connected components in the local binary image.
+                # Find connected components.
                 num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(local_bin, connectivity=8)
                 valid_centroids = []
                 valid_colors = []
                 color_threshold = 30
                 
-                # Process each blob (looping over detected labels is unavoidable here).
+                # Process each blob (label 0 is background).
                 for label in range(1, num_labels):
                     area = stats[label, cv2.CC_STAT_AREA]
+                    if DEBUG:
+                        print(f"Blob {label}: Area = {area}")
                     if area >= min_blob_area:
                         ys, xs = np.where(labels == label)
                         mean_R = np.mean(R[ys, xs])
@@ -145,7 +138,6 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
                 
                 num_blobs = len(valid_centroids)
                 if num_blobs == 4:
-                    # --- 6. Sort blobs by angular position relative to the hub center ---
                     angles = []
                     for centroid in valid_centroids:
                         dx = centroid[0] - c_x
@@ -186,7 +178,6 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
             print("No circles detected by HoughCircles")
     
     if DEBUG:
-        # Create a final debug image overlaying valid hubs (green) and failed candidates (red).
         final_debug_img = img.copy()
         for hub in hubs:
             cx, cy = int(hub["center"][0]), int(hub["center"][1])

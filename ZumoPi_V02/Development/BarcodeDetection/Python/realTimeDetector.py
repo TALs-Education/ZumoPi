@@ -16,7 +16,7 @@ def main():
     # Parameters (non-debug mode, adjust as needed).
     circle_diameter = 100
     expected_dark_fraction = 0.85
-    min_blob_area = 150
+    min_blob_area = circle_diameter*2.5 # blob size = diameter*resolution/400 1080p = 2.5
 
     # Create a named window to display output.
     cv2.namedWindow("Real-Time Hub Detection", cv2.WINDOW_NORMAL)
