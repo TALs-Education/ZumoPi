@@ -7,4 +7,46 @@ https://www.arduino.cc/en/software
 Zumo-arduino Arduino Mbed OS RP2040 Boards 
 https://github.com/adamgreen/pololu-3pi-plus-2040-arduino-library
 
-add arduino cli
+Arduino library - Pololu3piPlus2040 compatible with Zumo2040
+https://github.com/adamgreen/pololu-3pi-plus-2040-arduino-library
+
+MicroPython Zumo2040 - https://github.com/pololu/zumo-2040-robot
+
+install arduino-cli  	https://siytek.com/arduino-cli-raspberry-pi/
+
+work with virtualenv: https://learn.adafruit.com/python-virtual-environment-usage-on-raspberry-pi/overview
+$sudo apt install python3-venv
+$python3 -m venv zumoPy
+
+activate enviroment
+$source zumoPy/bin/activate
+
+deactivate enviroment:
+$deactivate
+
+Backup enviroment:
+$pip freeze > requirements.txt
+
+Update enviroment:
+$pip install -r requirements.txt
+
+upgrade python-pip
+$python3 -m pip install --upgrade pip
+
+Shutdown after 4 hours from startup
+$sudo nano /etc/rc.local
+/sbin/shutdown -h +240 &
+
+cancel auto shutdown:
+$sudo shutdown -c
+
+python packages:
+$pip install dash
+$pip install evdev
+$pip install pyserial
+$pip install dash-daq
+$pip install opencv-python
+$pip install matplotlib
+
+Testcamera:
+libcamera-hello
