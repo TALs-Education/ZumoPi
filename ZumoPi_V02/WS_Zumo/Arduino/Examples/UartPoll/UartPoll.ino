@@ -30,7 +30,9 @@ void pollUART() {
       if (c == '\n') break;
       data += c;
     }
-    
+
+    // Trim any leftover whitespace/newline characters.
+    data.trim();    
     if (data.length() > 0) {
       Serial.print("myUART Received: ");
       Serial.println(data);

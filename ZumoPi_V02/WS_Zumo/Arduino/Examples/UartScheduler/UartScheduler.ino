@@ -1,3 +1,7 @@
+// Communication example between Raspberry Pi <--> Pico2040 over:
+// - USB UART --> USB Pi ttyACM0
+// - myUART (on GP28/GP29) --> Pi UART (ttyAMA10)
+
 #include <Scheduler.h>
 #include <Pololu3piPlus2040.h>
 
@@ -52,23 +56,28 @@ void loop() {
 
 // Task: Poll the custom UART for incoming data.
 void pollUART() {
-  if (myUART.available()) {
-    String data = "";
-    // Read data until a newline is encountered.
-    while (myUART.available()) {
-      char c = myUART.read();
-      if (c == '\n') break;
-      data += c;
-    }
-    
-    if (data.length() > 0) {
-      Serial.print("myUART Received: ");
-      Serial.println(data);
+  // Use a static buffer to accumulate incoming characters.
+  static String uartBuffer = "";
+  
+  while (myUART.available()) {
+    char c = myUART.read();
+    if (c == '\n') {
+      // A newline indicates end-of-message.
+      String data = uartBuffer;
+      uartBuffer = "";  // Clear the buffer.
+      data.trim();      // Remove stray whitespace/newlines.
       
-      // Prepare and send the echo message.
-      char outBuffer[128];
-      sprintf(outBuffer, "myUART: %s\n", data.c_str());
-      myUART.write((const uint8_t*)outBuffer, strlen(outBuffer));
+      if (data.length() > 0) {
+        Serial.print("myUART Received: ");
+        Serial.println(data);
+        
+        // Prepare and send the echo message.
+        char outBuffer[128];
+        sprintf(outBuffer, "myUART: %s\n", data.c_str());
+        myUART.write((const uint8_t*)outBuffer, strlen(outBuffer));
+      }
+    } else {
+      uartBuffer += c;
     }
   }
   yield(); // Yield to allow other tasks to run.
@@ -76,17 +85,28 @@ void pollUART() {
 
 // Task: Poll the USB Serial for incoming data.
 void pollUSB() {
-  if (Serial.available()) {
-    String data = Serial.readStringUntil('\n');
-    data.trim();  // Remove newline and extra whitespace.
-    if (data.length() > 0) {
-      Serial.print("USB Serial Received: ");
-      Serial.println(data);
+  // Use a static buffer to accumulate incoming characters.
+  static String usbBuffer = "";
+  
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\n') {
+      // Newline indicates end-of-message.
+      String data = usbBuffer;
+      usbBuffer = "";  // Clear the buffer.
+      data.trim();     // Remove stray whitespace/newlines.
       
-      // Prepare and send the message over myUART.
-      char outBuffer[128];
-      sprintf(outBuffer, "USB Serial: %s\n", data.c_str());
-      myUART.write((const uint8_t*)outBuffer, strlen(outBuffer));
+      if (data.length() > 0) {
+        Serial.print("USB Serial Received: ");
+        Serial.println(data);
+        
+        // Prepare and send the message over myUART.
+        char outBuffer[128];
+        sprintf(outBuffer, "USB Serial: %s\n", data.c_str());
+        myUART.write((const uint8_t*)outBuffer, strlen(outBuffer));
+      }
+    } else {
+      usbBuffer += c;
     }
   }
   yield(); // Yield to allow other tasks to run.
