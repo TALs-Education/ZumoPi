@@ -14,9 +14,19 @@ MicroPython Zumo2040 - https://github.com/pololu/zumo-2040-robot
 
 install arduino-cli  	https://siytek.com/arduino-cli-raspberry-pi/
 
+Install picamera2 https://forums.raspberrypi.com/viewtopic.php?t=361758 usually not needed installed by default
+https://datasheets.raspberrypi.com/camera/picamera2-manual.pdf
+$sudo apt install python3-picamera2
+
+Install openCV
+sudo apt install -y python3-opencv
+sudo apt install -y opencv-data
+
 work with virtualenv: https://learn.adafruit.com/python-virtual-environment-usage-on-raspberry-pi/overview
 $sudo apt install python3-venv
-$python3 -m venv zumoPy
+
+create a virtual environment which uses the system python packages for picamera2
+$python3 -m venv --system-site-packages zumoPy
 
 activate enviroment
 $source zumoPy/bin/activate
@@ -45,8 +55,10 @@ $pip install dash
 $pip install evdev
 $pip install pyserial
 $pip install dash-daq
-$pip install opencv-python
 $pip install matplotlib
+
+Optional packages:
+pip3 install tflite-runtime
 
 Testcamera:
 libcamera-hello
