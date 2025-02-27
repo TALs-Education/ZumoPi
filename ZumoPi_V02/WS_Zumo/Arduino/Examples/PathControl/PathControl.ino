@@ -19,7 +19,7 @@ PathController pathCtrl;
 float desiredPath[][2] = {
   {100, 0},
   {200, 100},
-  {500, 100}
+  {300, 100}
 };
 const int numPoints = sizeof(desiredPath) / sizeof(desiredPath[0]);
 
@@ -75,12 +75,13 @@ void serialTask() {
     lastPrint = now;
     char buf[100];
     // Odometry
-    //snprintf(buf, sizeof(buf), "X: %.2f mm, Y: %.2f mm, Theta: %.2f deg, vL: %.2f mm/s, vR: %.2f mm/s", 
-    //         odom.posX, odom.posY, odom.theta * 57.2958, odom.v_left, odom.v_right);
+    snprintf(buf, sizeof(buf), "X: %.2f mm, Y: %.2f mm, Theta: %.2f deg, vL: %.2f mm/s, vR: %.2f mm/s", 
+    
+             odom.posX, odom.posY, odom.theta * 57.2958, odom.v_left, odom.v_right);
     
     // car states control         
-    snprintf(buf, sizeof(buf), "X: %.2f mm, Y: %.2f mm, Theta: %.2f deg, de: %.2f mm/s, theta_t: %.2f mm/s", 
-             pathCtrl.car_state.posx, pathCtrl.car_state.posy, pathCtrl.car_state.theta * 57.2958, pathCtrl.path_state.de, pathCtrl.path_state.theta_t);    
+//    snprintf(buf, sizeof(buf), "X: %.2f mm, Y: %.2f mm, Theta: %.2f deg, de: %.2f mm/s, theta_t: %.2f mm/s", 
+//             pathCtrl.car_state.posx, pathCtrl.car_state.posy, pathCtrl.car_state.theta * 57.2958, pathCtrl.path_state.de, pathCtrl.path_state.theta_t);    
     // wheels controller performance:
 //    snprintf(buf, sizeof(buf),"vL actual: %.2f mm/s, vR actual: %.2f mm/s vL target: %.2f mm/s, vR target: %.2f mm/s ",
 //             odom.v_left, odom.v_right,pathCtrl.v_l_target, pathCtrl.v_r_target);
