@@ -1,9 +1,9 @@
 # ZumoPi
 Zumo robot platform with a raspberry pi controller
-![Platform Image](https://github.com/TAU-Robotics/ZumoPi/blob/main/Media/ZumoPi_V01/Images/Zumo_Setup.jpg)
+![Platform Image](https://github.com/TALs-Education/ZumoPi/blob/main/Media/ZumoPi_V02/ZumoV02.jpg)
 
-## Block Diagram
-![Block Diagram](https://docs.google.com/drawings/d/e/2PACX-1vSK_I-3UJ_sYJoir-8bE5Du5rl0Hd4PBCqslChlSSzEfVgBXf6rR3nO32229ul59KgZLSprrLeTVr-V/pub?w=1344&h=636)
+## Block Diagram ZumoPi V02
+![Block Diagram](https://docs.google.com/drawings/d/e/2PACX-1vQpQyPflurfwIB7fRBoC2kC0jIkPV853IcbCSbXERw5h_Jhxc9N7Epzz_ND9h0Ww2mZRnq-OR2cxnLC/pub?w=960&h=720)
 
 ## Demonstrations:
 
