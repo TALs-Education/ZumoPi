@@ -95,7 +95,7 @@ class BallDetect:
                 D_corr = 2 * (f_avg * BALL_DIAMETER) / d_full  # corrected distance in mm
 
                 # Compute expected diameter in pixels based on the corrected distance.
-                expected_d_pixels = (f_avg * BALL_DIAMETER) / D_corr
+                expected_d_pixels = (f_avg * BALL_DIAMETER) / D_corr*1.5
 
                 # Compare measured diameter with expected diameter.
                 size_diff = abs(measured_d_pixels - expected_d_pixels)
