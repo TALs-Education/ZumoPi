@@ -15,8 +15,7 @@ logging.getLogger('werkzeug').setLevel(logging.ERROR)
 # Dash imports
 import dash
 import dash_daq as daq
-from dash import html
-from dash import dcc
+from dash import html, dcc
 import plotly.graph_objs as go
 from flask import request
 
@@ -45,6 +44,9 @@ class ZumoApp:
         self.picam2.configure(preview_config)
         self.picam2.start()
 
+        # Initialize a variable for fps measurement.
+        self.last_frame_time = time.time()
+
         self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
         self.create_layout()
 
@@ -70,8 +72,6 @@ class ZumoApp:
             command = {"vl": left_velocity, "vr": right_velocity}
             msg = json.dumps(command) + "\n"
             self.ser.write(msg.encode('ascii'))
-            # Console messages commented out:
-            # print("Sent:", msg.strip())
             time.sleep(0.1)
 
     def receive_data(self):
@@ -82,8 +82,6 @@ class ZumoApp:
                     self.last_messages.append(c)
                     if len(self.last_messages) > 3:
                         self.last_messages.pop(0)
-                # Console messages commented out:
-                # print("Received:", c)
                 self.file.write(c + "\n")
             else:
                 time.sleep(0.05)
@@ -107,7 +105,8 @@ class ZumoApp:
             html.Div([
                 dcc.Graph(id='live-plot', style={'height': '300px'})
             ]),
-            dcc.Interval(id='interval-component', interval=500, n_intervals=0),
+            # Update interval set to 100 ms.
+            dcc.Interval(id='interval-component', interval=100, n_intervals=0),
             html.Div(id='hidden-div', style={'display': 'none'})
         ])
 
@@ -140,10 +139,25 @@ class ZumoApp:
         return [f'Angle is {angle}', html.Br(), f'Force is {force}']
 
     def update_image(self, n_intervals):
+        # Measure current time and compute FPS.
+        current_time = time.time()
+        dt = current_time - self.last_frame_time
+        fps = 1/dt if dt > 0 else 0
+        self.last_frame_time = current_time
+
         # Capture a frame from the camera.
         frame = self.picam2.capture_array()
-        # Encode the frame as JPEG.
-        ret, buffer = cv2.imencode('.jpg', frame)
+        height, width, _ = frame.shape
+
+        # Overlay FPS and resolution on the image.
+        overlay_text = f"Resolution: {width}x{height} | FPS: {fps:.2f}"
+        cv2.putText(frame, overlay_text, (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+        # Encode the frame as JPEG with quality 50.
+        ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 50])
+        if not ret:
+            return dash.no_update
         jpg_as_text = base64.b64encode(buffer).decode('utf-8')
         src = "data:image/jpeg;base64,{}".format(jpg_as_text)
         return src
@@ -159,7 +173,6 @@ class ZumoApp:
             if last_messages:
                 try:
                     data_msg = json.loads(last_messages[-1])
-                    # Extract the velocities using keys "vL" and "vR".
                     left_velocity = data_msg.get("vL", 0)
                     right_velocity = data_msg.get("vR", 0)
                     values = [left_velocity, right_velocity]

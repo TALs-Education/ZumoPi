@@ -7,7 +7,6 @@ import json
 import numpy as np
 from collections import deque
 import logging
-import base64
 
 # Suppress Flask/werkzeug HTTP request logging
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
@@ -21,14 +20,13 @@ from flask import request
 
 # Picamera2 and OpenCV imports
 from picamera2 import Picamera2
-import cv2
 
 # Import the ball detection library.
 from ball_detect import BallDetect
 
 class ZumoApp:
     def __init__(self, serial_port, external_stylesheets):
-        # Open the serial port.
+        # Open the serial port
         self.ser = serial.Serial(serial_port, 115200)
         self.zumo_angle = 0
         self.zumo_speed = 0
@@ -40,10 +38,10 @@ class ZumoApp:
         self.received_values = deque(maxlen=100)
         self.prev_frame_time = time.time()
 
-        # Initialize the camera.
+        # Initialize the camera with 640x480 resolution for processing.
         self.picam2 = Picamera2()
         preview_config = self.picam2.create_preview_configuration({
-            "format": "RGB888", "size": (480, 360)
+            "format": "RGB888", "size": (640, 480)
         })
         self.picam2.configure(preview_config)
         self.picam2.start()
@@ -101,7 +99,7 @@ class ZumoApp:
             html.Div([
                 dcc.Graph(id='live-plot', style={'height': '300px'})
             ]),
-            dcc.Interval(id='interval-component', interval=500, n_intervals=0),
+            dcc.Interval(id='interval-component', interval=100, n_intervals=0),
             html.Div(id='hidden-div', style={'display': 'none'})
         ])
 
@@ -120,7 +118,7 @@ class ZumoApp:
             dash.dependencies.Output('live-plot', 'figure'),
             [dash.dependencies.Input('interval-component', 'n_intervals')]
         )(self.update_plot)
-         
+
         self.app.callback(
             dash.dependencies.Output('hidden-div', 'children'),
             [dash.dependencies.Input('close-button', 'n_clicks')]
@@ -133,7 +131,7 @@ class ZumoApp:
         return [f'Angle is {angle}', html.Br(), f'Force is {force}']
 
     def update_image(self, n_intervals):
-        # Delegate frame processing to BallDetect.
+        # Use BallDetect's process_frame method which returns a Base64-encoded JPEG image.
         return self.ball_detector.process_frame()
 
     def update_plot(self, n_intervals):
@@ -168,14 +166,11 @@ class ZumoApp:
                         name=variable_names[i] if i < len(variable_names) else f'value{i+1}'
                     ) for i in range(len(data))
                 ]
-                layout = go.Layout(
-                    xaxis=dict(range=[0, len(data[0])]),
-                    yaxis=dict(range=[min(min(d) for d in data), max(max(d) for d in data)]),
-                    title='Live Plot of Incoming Messages'
-                )
+                layout = go.Layout(title='Live Plot of Incoming Messages')
             else:
                 traces = []
                 layout = go.Layout(title='Live Plot of Incoming Messages')
+
             return {'data': traces, 'layout': layout}
         except Exception as e:
             logging.error("Error in update_plot: %s", e)
@@ -205,7 +200,6 @@ def main():
     try:
         zumo_app.start()
     except KeyboardInterrupt:
-        print("Ctrl+C detected, stopping the application.")
         zumo_app.close()
 
 if __name__ == "__main__":
