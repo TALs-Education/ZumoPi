@@ -1,96 +1,85 @@
 #!/usr/bin/env python3
 
-# Web streaming example
-# Source code from the official PiCamera package
-# http://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
-
+import time
 import io
-import picamera
-import logging
-import socketserver
-from threading import Condition
-from http import server
+import base64
+import dash
+from dash import html, dcc
+from dash.dependencies import Input, Output
+from picamzero import Camera
+from PIL import Image, ImageDraw, ImageFont
 
-PAGE="""\
-<html>
-<head>
-<title>Raspberry Pi - Camera</title>
-</head>
-<body>
-<center><h1>Raspberry Pi - Camera</h1></center>
-<center><img src="stream.mjpg" width="640" height="480"></center>
-</body>
-</html>
-"""
+# We'll track time between frames to estimate FPS
+last_time = time.time()
 
-class StreamingOutput(object):
-    def __init__(self):
-        self.frame = None
-        self.buffer = io.BytesIO()
-        self.condition = Condition()
+# Optional: load a TrueType font for on-image text.
+try:
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+except:
+    font = ImageFont.load_default()
 
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            # New frame, copy the existing buffer's content and notify all
-            # clients it's available
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
+# Initialize the picamzero camera
+cam = Camera()
+cam.flip_camera(hflip=True, vflip=False)  # Flip if needed
+# By default, picamzero may capture full resolution (e.g., 2592×1944)
+# You can explicitly set resolution if desired, e.g.:
+cam.video_size = (640, 480)
+cam.still_size = (640, 480)
 
-class StreamingHandler(server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/':
-            self.send_response(301)
-            self.send_header('Location', '/index.html')
-            self.end_headers()
-        elif self.path == '/index.html':
-            content = PAGE.encode('utf-8')
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
-            self.send_header('Content-Length', len(content))
-            self.end_headers()
-            self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
-            self.send_response(200)
-            self.send_header('Age', 0)
-            self.send_header('Cache-Control', 'no-cache, private')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-            self.end_headers()
-            try:
-                while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(frame))
-                    self.end_headers()
-                    self.wfile.write(frame)
-                    self.wfile.write(b'\r\n')
-            except Exception as e:
-                logging.warning(
-                    'Removed streaming client %s: %s',
-                    self.client_address, str(e))
-        else:
-            self.send_error(404)
-            self.end_headers()
+def capture_annotated_frame():
+    """
+    Capture a frame from picamzero, annotate it with FPS, 
+    compress to JPEG (quality=50), and return a base64 data URI.
+    """
+    global last_time
 
-class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
-    allow_reuse_address = True
-    daemon_threads = True
+    # Calculate FPS from time delta
+    current_time = time.time()
+    delta = current_time - last_time
+    if delta <= 0:
+        delta = 1e-6
+    fps = 1.0 / delta
+    last_time = current_time
 
-with picamera.PiCamera(resolution='640x480', framerate=5) as camera:   # 24
-    output = StreamingOutput()
-    #Uncomment the next line to change your Pi's Camera rotation (in degrees)
-    #camera.rotation = 90
-    camera.start_recording(output, format='mjpeg')
-    try:
-        address = ('', 8000)
-        server = StreamingServer(address, StreamingHandler)
-        server.serve_forever()
-    finally:
-        camera.stop_recording()
+    # Grab the raw camera data (NumPy array)
+    frame_array = cam.capture_array()
+
+    # Convert to PIL Image
+    pil_img = Image.fromarray(frame_array)
+
+    # (Optional) Resize to reduce bandwidth, e.g. 640×480:
+    # pil_img = pil_img.resize((640, 480), Image.LANCZOS)
+
+    # Draw FPS text on the image
+    draw = ImageDraw.Draw(pil_img)
+    fps_text = f"FPS: {fps:.1f}"
+    draw.text((10, 10), fps_text, fill="white", font=font)
+
+    # Convert to JPEG with quality=50
+    buffer = io.BytesIO()
+    pil_img.save(buffer, format="JPEG", quality=50)
+    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    # Return data URI
+    return "data:image/jpeg;base64," + encoded
+
+# Build a minimal Dash application
+app = dash.Dash(__name__)
+app.layout = html.Div([
+    html.H1("Camera Stream (picamzero + Dash)"),
+    html.Img(id="live-image"),
+    # Interval for ~1 FPS => 1000 ms
+    dcc.Interval(id="interval-component", interval=1000, n_intervals=0)
+])
+
+@app.callback(
+    Output("live-image", "src"),
+    [Input("interval-component", "n_intervals")]
+)
+def update_image(n):
+    """Callback that captures/encodes an image every ~100ms."""
+    return capture_annotated_frame()
+
+if __name__ == "__main__":
+    # Run on port 8000, available on all interfaces
+    app.run_server(host="0.0.0.0", port=8000, debug=False)

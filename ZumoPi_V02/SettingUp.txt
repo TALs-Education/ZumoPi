@@ -56,7 +56,6 @@ $pip install evdev
 $pip install pyserial
 $pip install dash-daq
 $pip install matplotlib
-$pip install pysimplegui
 
 Optional packages:
 pip3 install tflite-runtime
