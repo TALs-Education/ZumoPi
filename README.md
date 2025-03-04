@@ -17,8 +17,7 @@ ZumoPi is a compact robot platform built around the Pololu Zumo chassis and cont
 
 ## Course Slides
 
-### ZumoPi V01
-- **[Autonomous Systems Lab](https://docs.google.com/presentation/d/e/2PACX-1vQmw0fZNkPpz4XDnrIGdxDWG3Z4L_XQwmQykD_EHqDK8AJbvX6_nIueKj2iX2mfBb2oagcTGYDS2QBV/pub?start=false&loop=false&delayms=60000)**  
+- **[Autonomous Systems Lab](https://docs.google.com/presentation/d/e/2PACX-1vRStIoiYa2XbYNI_D9ZccQSjIIEqi7QFh0CPTO20TWpKoEXQ6jn_6Y2cxPnYvpHpmra1TaAvrsPDCbp/pub?start=false&loop=false&delayms=60000)**
   *Introduction to building and controlling autonomous robots, covering fundamental concepts such as sensor fusion, actuator control, and system integration.*
 
 - **[Embedded](https://docs.google.com/presentation/d/e/2PACX-1vSVH96BDv7Gbm_2Dyi4LwYNgEV1KDVOWocW6gcsRNBsZze7Nb_3pYwGQ6NuU6_85LWZyFI2r82p398f/pub?start=false&loop=false&delayms=60000)**  
@@ -26,10 +25,6 @@ ZumoPi is a compact robot platform built around the Pololu Zumo chassis and cont
 
 - **[PathControl](https://docs.google.com/document/d/e/2PACX-1vRsz_DzcoeoC0eYsfCduID82cWogbbcEKy6w8faJZLzmo0udBw0vqawurkeEf2-fQOZ_oXzBpeuWSpU/pub)**  
   *Detailed instructions and theory on path planning and control algorithms, demonstrating how to implement robust path-following routines on the ZumoPi robot.*
-
-### ZumoPi V02
-
-- **[Autonomous Systems Lab](https://docs.google.com/presentation/d/e/2PACX-1vRStIoiYa2XbYNI_D9ZccQSjIIEqi7QFh0CPTO20TWpKoEXQ6jn_6Y2cxPnYvpHpmra1TaAvrsPDCbp/pub?start=false&loop=false&delayms=60000)**
 
 ---
 
