@@ -23,7 +23,7 @@ ZumoPi is a compact robot platform built around the Pololu Zumo chassis and cont
 - **[Embedded](https://docs.google.com/presentation/d/e/2PACX-1vTtC3hYFiazQUpXpRI4Cu9u7xv1cP7oLfKXLLpGbvr99-eDz1KW8hfmtAW4wn4Qjw7GQxjzbYANB0p1/pub?start=false&loop=false&delayms=60000)**  
   *Focus on embedded systems programming, including microcontroller or single-board computer setups, interfacing with hardware, and real-time control considerations.*
 
-- **[PathControl](https://docs.google.com/document/d/e/2PACX-1vRsz_DzcoeoC0eYsfCduID82cWogbbcEKy6w8faJZLzmo0udBw0vqawurkeEf2-fQOZ_oXzBpeuWSpU/pub)**  
+- **[PathControl](https://docs.google.com/document/d/e/2PACX-1vTpQWTco3Bi_aDHO9klbxftK4g1yNk0Z4INCxaVdjpg8Rd_K-o5vXg43kFpY49FMV86XIksFvMH8WC9/pub)**  
   *Detailed instructions and theory on path planning and control algorithms, demonstrating how to implement robust path-following routines on the ZumoPi robot.*
 
 ---
