@@ -2,16 +2,14 @@
 
 PathController::PathController() {
   // Initialize control parameters.
-  dt_time  = 0.0f;           // 10 ms update interval
-  WHEELS_DISTANCE = 98.0f;   // mm between wheels
-  a_max = 200.0f;            // maximum acceleration (mm/s^2)
-  v_max = 100.0f;            // maximum forward velocity (mm/s)
+  dt_time  = 0.01f;           // 10 ms update interval
+  WHEELS_DISTANCE = 98.0f;    // mm between wheels
+  a_max = 200.0f;             // maximum acceleration (mm/s^2)
+  v_max = 100.0f;             // maximum forward velocity (mm/s)
   Kp = 1.0f;
   Ki = 0.1f;
-  Kp_theta = 100.0f; //1.0f;
-  Kp_de = 1.0f;
-  // encoder2dist should be set externally (for example, copy it from your Odometry instance)
-  encoder2dist = 0.0f;       
+  Kp_theta = 100.0f;
+  Kp_de = 1.0f;    
 
   // Initialize target velocities and integrators.
   v_l_target = 0.0f;

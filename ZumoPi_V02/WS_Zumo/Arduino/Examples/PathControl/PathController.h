@@ -56,7 +56,6 @@ public:
   float Ki;              // integral gain for velocity control
   float Kp_theta;        // gain for heading error
   float Kp_de;           // gain for cross-track error
-  float encoder2dist;    // mm per encoder pulse
 
   // Target velocities for each wheel (mm/s)
   float v_l_target;

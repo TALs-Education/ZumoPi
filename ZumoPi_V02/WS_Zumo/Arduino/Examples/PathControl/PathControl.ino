@@ -7,6 +7,7 @@
 Motors motors;
 Encoders encoders;
 ButtonA buttonA;  // Button to trigger the path start.
+UART myUART(28, 29);         // myUART on GP28 (TX) and GP29 (RX)
 
 // Create an Odometry instance with your parameters:
 // Wheel diameter: 37.5 mm, Gear ratio: 75, Encoder pulses per rev: 12, Wheel distance: 98 mm.
@@ -68,33 +69,46 @@ void updateTask() {
 //--------------------------------------------------
 // Serial Output Task (every 10 ms)
 //--------------------------------------------------
+//--------------------------------------------------
+// Serial Output Task (every 10 ms) - JSON format
+//--------------------------------------------------
 void serialTask() {
   static unsigned long lastPrint = 0;
   unsigned long now = millis();
   if (now - lastPrint >= 10) {  // every 10 ms
     lastPrint = now;
-    char buf[100];
-    // Odometry
-    snprintf(buf, sizeof(buf), "X: %.2f mm, Y: %.2f mm, Theta: %.2f deg, vL: %.2f mm/s, vR: %.2f mm/s", 
     
-             odom.posX, odom.posY, odom.theta * 57.2958, odom.v_left, odom.v_right);
-    
+    char buf[128];
+    // Create a JSON-like string. 
+    // Each key is surrounded by double quotes, and each value is numeric.
+    // Example: {"X": 123.45, "Y": 67.89, "Theta": 45.67, "vL": 12.34, "vR": 56.78}
+    snprintf(buf, sizeof(buf),
+      "{\"X\":%.2f,\"Y\":%.2f,\"Theta\":%.2f,\"vL\":%.2f,\"vR\":%.2f}",
+      odom.posX,
+      odom.posY,
+      odom.theta * 57.2958,  // converting radians -> degrees
+      odom.v_left,
+      odom.v_right
+    );
+    myUART.println(buf); // send to pi serial port
+    Serial.println(buf); // send to usb for debug
+  }
+  yield();
+}
+
+// alternative messages
     // car states control         
 //    snprintf(buf, sizeof(buf), "X: %.2f mm, Y: %.2f mm, Theta: %.2f deg, de: %.2f mm/s, theta_t: %.2f mm/s", 
 //             pathCtrl.car_state.posx, pathCtrl.car_state.posy, pathCtrl.car_state.theta * 57.2958, pathCtrl.path_state.de, pathCtrl.path_state.theta_t);    
     // wheels controller performance:
 //    snprintf(buf, sizeof(buf),"vL actual: %.2f mm/s, vR actual: %.2f mm/s vL target: %.2f mm/s, vR target: %.2f mm/s ",
 //             odom.v_left, odom.v_right,pathCtrl.v_l_target, pathCtrl.v_r_target);
-    Serial.println(buf);
-  }
-  yield();
-}
-
 //--------------------------------------------------
 // Setup and Main Loop
 //--------------------------------------------------
 void setup() {
   Serial.begin(115200);
+  myUART.begin(115200, SERIAL_8N1);
   delay(100);
   
   // Initialize the PathController.
