@@ -10,13 +10,13 @@ def main():
         return
 
     # Set resolution to 1280x720.
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     
     # Parameters (non-debug mode, adjust as needed).
     circle_diameter = 100
     expected_dark_fraction = 0.85
-    min_blob_area = circle_diameter*2.5 # blob size = diameter*resolution/400 1080p = 2.5
+    min_blob_area = circle_diameter*1 # blob size = diameter*resolution/400 1080p = 2.5
 
     # Create a named window to display output.
     cv2.namedWindow("Real-Time Hub Detection", cv2.WINDOW_NORMAL)

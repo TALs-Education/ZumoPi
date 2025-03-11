@@ -2,28 +2,35 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def detect_hubs(img, DEBUG=False, circle_diameter=100, 
-                expected_dark_fraction=0.75, min_blob_area=100):
+def detect_hubs(img, DEBUG=False, thresholdLevel=0.4, circle_diameter=150, 
+                expected_dark_fraction=0.85, min_blob_area=100):
     """
-    detect_hubs Detects circular hubs with LED markers on a blue background by using
-    a grayscale mask (non-blue intensity) with HoughCircles.
+    detect_hubs Detects circular hubs with LED markers on a blue background.
+    
+    This function first creates a binary image (bin_img) from the grayscale image using 
+    thresholdLevel (scaled to [0,255]) and inversion (so that dark areas become white).
+    Then a blue gradient mask is computed and inverted so that non-blue regions are bright.
+    HoughCircles is applied on the median-filtered non-blue mask to find candidate circles.
+    For each candidate, the dark fraction is computed from bin_img. If it is within ±25%
+    of expected_dark_fraction, blobs (LED markers) are detected inside the candidate hub
+    by restricting bin_img to the candidate circle (forcing outside pixels to white) and
+    finding connected components where pixels are 0 (i.e. the LED markers).
     
     Parameters:
       img                   - Input RGB image as a NumPy array.
-      DEBUG                 - If True, displays debug images and prints info.
-      circle_diameter       - Nominal diameter for circle detection (default: 100).
-      expected_dark_fraction- Expected average non-blue intensity (normalized 0-1)
-                              inside a hub (default: 0.75).
-      min_blob_area         - Minimum area in pixels for a blob (default: 100).
+      DEBUG                 - If True, displays debug images and prints debug info.
+      thresholdLevel        - Normalized threshold (0-1) for binarization (default: 0.4).
+      circle_diameter       - Nominal diameter for hub detection (default: 150). Allowed range ±25%.
+      expected_dark_fraction- Expected fraction of dark area (from bin_img) inside a hub (default: 0.85).
+      min_blob_area         - Minimum area (in pixels) for a blob to be considered valid (default: 100).
     
     Returns:
-      hubs - A list of dictionaries. Each hub dict contains:
+      hubs - A list of dictionaries. Each dictionary represents a valid hub with:
              'center': (x, y), 'radius': r, 'numBlobs': number of detected blobs,
-             'darkFraction': computed average non-blue intensity,
-             and for each blob, keys 'blob1', 'blob2', 'blob3', 'blob4' with:
+             'darkFraction': computed dark fraction, and for each blob (blob1..blob4):
                  'center' and 'color'.
     """
-    # --- 1. Resize image if larger than 1920x1080 (1080p, 16:9) ---
+    # --- 1. Resize image if larger than 1920x1080 ---
     origH, origW = img.shape[:2]
     maxW, maxH = 1920, 1080
     if origW > maxW or origH > maxH:
@@ -34,8 +41,17 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
         if DEBUG:
             print(f"Resized image from ({origW}, {origH}) to ({new_w}, {new_h})")
     
-    # Create a grayscale version for local blob segmentation.
+    # --- 1.1 Create a binary image from the grayscale (like MATLAB's binImg) ---
     gray_img_original = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    thresh_value = int(thresholdLevel * 255)
+    _, bin_img = cv2.threshold(gray_img_original, thresh_value, 255, cv2.THRESH_BINARY)
+    bin_img = cv2.bitwise_not(bin_img)  # Invert: dark areas become white (255)
+
+    if DEBUG:
+        plt.figure()
+        plt.imshow(bin_img, cmap='gray')
+        plt.title("Binary Image (Inverted)")
+        plt.show()
     
     # --- 2. Create a grayscale mask based on the blue gradient ---
     R = img[:, :, 0].astype(np.float32)
@@ -47,19 +63,19 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
     norm_blue = np.empty_like(blue_grad)
     cv2.normalize(blue_grad, norm_blue, 0, 255, cv2.NORM_MINMAX)
     blue_mask = norm_blue.astype(np.uint8)
+    # Invert: non-blue regions become bright
     non_blue_mask = 255 - blue_mask
-    non_blue_norm = non_blue_mask.astype(np.float32)
-    non_blue_norm /= 255.0
-    
+
     if DEBUG:
         plt.figure()
         plt.imshow(non_blue_mask, cmap='gray')
         plt.title("Non-blue Grayscale Mask")
         plt.show()
     
-    # --- 3. Use HoughCircles on the non-blue mask ---
+    # --- 3. Apply median filtering to reduce noise ---
     non_blue_blur = cv2.medianBlur(non_blue_mask, 5)
     
+    # --- 4. Detect circles using HoughCircles on the non-blue mask ---
     min_radius = int(np.floor((circle_diameter * 0.75) / 2))
     max_radius = int(np.floor((circle_diameter * 1.25) / 2))
     
@@ -68,7 +84,7 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
                                param1=100, param2=30,
                                minRadius=min_radius, maxRadius=max_radius)
     
-    # --- Debug Plot: Raw HoughCircles Detections ---
+    # Debug: Plot raw HoughCircles detections.
     hough_img = cv2.cvtColor(non_blue_blur, cv2.COLOR_GRAY2BGR)
     if circles is not None:
         circles = np.uint16(np.around(circles))
@@ -86,30 +102,35 @@ def detect_hubs(img, DEBUG=False, circle_diameter=100,
     lower_dark = expected_dark_fraction * 0.75
     upper_dark = expected_dark_fraction * 1.25
     
-    # --- Precompute coordinate grid once ---
-    rows, cols = non_blue_norm.shape
+    # Precompute coordinate grid for dark fraction calculation using bin_img.
+    rows, cols = bin_img.shape
     y_grid, x_grid = np.ogrid[0:rows, 0:cols]
     
-    # --- 4. Process each detected circle ---
+    # --- 5. Process each detected circle ---
     if circles is not None:
         for (c_x, c_y, r) in circles[0, :]:
             c_x, c_y, r = int(c_x), int(c_y), int(r)
             circle_mask = (x_grid - c_x)**2 + (y_grid - c_y)**2 <= r**2
-            dark_fraction = np.mean(non_blue_norm[circle_mask])
+            
+            # Compute dark fraction using bin_img:
+            dark_fraction = np.sum(bin_img[circle_mask] == 255) / np.sum(circle_mask)
             
             if lower_dark <= dark_fraction <= upper_dark:
-                # --- 5. Analyze blobs inside the candidate hub on the original grayscale image ---
-                local_gray = cv2.bitwise_and(gray_img_original, gray_img_original,
-                                               mask=(circle_mask.astype(np.uint8) * 255))
-                ret, local_bin = cv2.threshold(local_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                # --- 6. Analyze blobs inside the candidate hub using bin_img ---
+                # Copy the binary image and force pixels outside the circle to white (255)
+                local_bin = bin_img.copy()
+                local_bin[~circle_mask] = 255
                 
-                # Find connected components.
-                num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(local_bin, connectivity=8)
+                # Create a "black region" mask: LED markers are expected to appear as 0.
+                black_region = (local_bin == 0).astype(np.uint8) * 255
+                
+                # Find connected components (blobs) in the black region.
+                num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(black_region, connectivity=8)
                 valid_centroids = []
                 valid_colors = []
                 color_threshold = 30
                 
-                # Process each blob (label 0 is background).
+                # Process each blob (skip label 0 which is background)
                 for label in range(1, num_labels):
                     area = stats[label, cv2.CC_STAT_AREA]
                     if DEBUG:
