@@ -26,6 +26,15 @@ ZumoPi is a compact robot platform built around the Pololu Zumo chassis and cont
 - **[PathControl](https://docs.google.com/document/d/e/2PACX-1vTpQWTco3Bi_aDHO9klbxftK4g1yNk0Z4INCxaVdjpg8Rd_K-o5vXg43kFpY49FMV86XIksFvMH8WC9/pub)**  
   *Detailed instructions and theory on path planning and control algorithms, demonstrating how to implement robust path-following routines on the ZumoPi robot.*
 
+- **[ImageProcessing](https://docs.google.com/document/d/e/2PACX-1vQhq_S6ipLvnca8L5krcB6jEdvge32izgGZujL72_1fmICjwPvxk8P4Rqf4jPIfgcK0uPkOjYD1Od2g/pub)**  
+  *The Image Processing Lab provides comprehensive guidance and theoretical foundations for practical image processing techniques, demonstrating how to implement vision-based applications on the ZumoPi robot.*
+
+- **[HomeExperiments](https://github.com/TALs-Education/HomeExperiments)**  
+  *​The HomeExperiments repository offers students home experiment kits focusing on motor control, Arduino integration, and sensor applications, facilitating hands-on learning of embedded systems concepts.*
+  
+
+
+
 ---
 
 ## Demonstrations
