@@ -148,7 +148,8 @@ try:
 
             # Compute X offset from camera centerline
             X_world = R * math.tan(alpha_rad)
-            Y_world = R * math.sqrt(2)+25.0 #factor in y axis and offset from car bumper
+            # Factor in y axis and offset from car bumper to adjust to real world measurments
+            Y_world = R * math.sqrt(2)+25.0 
 
             # Overlay computed position, perimeter, white fraction, and pixel coordinates
             pos_text = f"X={X_world:.1f}mm, Y={Y_world:.1f}mm"
