@@ -153,10 +153,9 @@ void PathController::update(const Odometry &odom, float desired_pos[][2], int nu
     path_state.theta_t = acos(dotVdVr) * dir;
   }
   
-  // Stop condition: if at last point and within stopDistance, or if target is behind.
-  float dotVtVr = (Vt[0]*Vr[0] + Vt[1]*Vr[1]) / (sqrt(Vt[0]*Vt[0] + Vt[1]*Vt[1]));
-  if ((path_state.currPoint == numPoints - 1 && fabs(path_state.dist) < stopDistance) ||
-      (dotVtVr < -0.1f)) {
+  // Stop condition: if at last point and within stopDistance or if last point is behind.
+  float dotVtVr = (Vt[0]*Vr[0] + Vt[1]*Vr[1]);
+  if ((path_state.currPoint == numPoints - 1) && ((fabs(path_state.dist) < stopDistance) || (dotVtVr < -0.1f))) {
     path_state.v_forward = 0;
     path_state.theta_t = 0;
     setMotorSpeeds(0, 0);

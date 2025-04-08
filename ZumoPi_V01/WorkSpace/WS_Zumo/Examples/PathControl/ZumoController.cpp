@@ -166,9 +166,8 @@ void ZumoController::P2P_CTRL(float desired_pos[][2], int numPoints) {
         path_state.theta_t = acos(dotVdVr) * dir; // angle from desired path
     }
 
-    // stop condition, happens only if reached last point
-    if ((path_state.currPoint == numPoints - 1) && (abs(path_state.dist) < stopDistance) || ((Vt[0]*Vr[0] + Vt[1]*Vr[1])/sqrt(Vr[0]*Vr[0] + Vr[1]*Vr[1]) < -0.1f)){
-        // delta(d) - in case we missed the last point
+    // stop condition, happens only if reached last point and if reached stop distance or passed the last point - dotVtVr
+    if ((path_state.currPoint == numPoints - 1) && ((abs(path_state.dist) < stopDistance) || ((Vt[0]*Vr[0] + Vt[1]*Vr[1]) < -0.1f))){
         path_state.v_forward = 0;
         path_state.theta_t = 0;
         motorsSetSpeed(0, 0);
