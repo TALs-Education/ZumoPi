@@ -19,8 +19,9 @@ PathController pathCtrl;
 // Define desired path (coordinates in mm).
 float desiredPath[][2] = {
   {100, 0},
-  {200, 100},
-  {300, 100}
+  {200, -100},
+  {350, -100},
+  {500, -100}
 };
 const int numPoints = sizeof(desiredPath) / sizeof(desiredPath[0]);
 
