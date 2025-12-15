@@ -43,10 +43,6 @@ $pip install -r requirements.txt
 upgrade python-pip
 $python3 -m pip install --upgrade pip
 
-Shutdown after 4 hours from startup
-$sudo nano /etc/rc.local
-/sbin/shutdown -h +240 &
-
 cancel auto shutdown:
 $sudo shutdown -c
 

@@ -11,7 +11,7 @@ CAMERA_TILT_DEG = 25.0     # Camera tilted downward by 25 degrees
 CAMERA_TILT_RAD = math.radians(CAMERA_TILT_DEG)
 HORIZONTAL_FOV_DEG = 102.0 # Horizontal field of view (degrees)
 VERTICAL_FOV_DEG = 67.0    # Vertical field of view (degrees)
-BALL_DIAMETER = 70.0       # mm (real-world diameter)
+BALL_DIAMETER = 60.0       # mm (real-world diameter)
 BALL_RADIUS_REAL = BALL_DIAMETER / 2.0  # 35 mm
 
 class BallDetect:
