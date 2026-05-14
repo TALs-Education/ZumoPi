@@ -1,0 +1,67 @@
+{
+  "name": "Mono Traffic Cone Pot Stackable",
+  "base": {
+    "coordSystem": "cylindrical",
+    "baseType": "basicEffect",
+    "preset": "Linear Taper",
+    "equation": "R * (0.1 + 0.9 * pow(1 - v, 1.05) + 0.10 * exp(-pow((v - 0.08) / 0.10, 2)))",
+    "baseRadius": 3,
+    "height": 6
+  },
+  "structure": {
+    "modelMode": "pot",
+    "wall": 0.25,
+    "bottomThickness": 0.25,
+    "cylDrain": 2.5,
+    "sphTopCut": 25,
+    "sphBotFlatten": 150,
+    "sphBotCut": 175
+  },
+  "plate": {
+    "enabled": false,
+    "plateHeight": 1.5,
+    "plateOpeningAngle": 25,
+    "plateRadiusExtra": 0.5
+  },
+  "texture": {
+    "type": "utility",
+    "preset": "None (Flat Surface)",
+    "equation": "0",
+    "intensity": 0.15
+  },
+  "patterns": {
+    "preset1": "Basic Band Mask",
+    "equation1": "0.10 - abs(v - 0.35)",
+    "preset2": "Basic Band Mask",
+    "equation2": "0.1 - abs(v - 0.7)",
+    "baseColor": "#111111",
+    "patternColor1": "#f5f5f5",
+    "patternColor2": "#f5f5f5",
+    "overlapColor": "#ffffff",
+    "depthMm": 0.8
+  },
+  "mesh": {
+    "resV": 120,
+    "resT": 180,
+    "patternResV": 120,
+    "patternResT": 180
+  },
+  "modifier": {
+    "type": "utility",
+    "preset": "None (No Modifier)",
+    "equation": "0",
+    "strength": 0,
+    "target": "base"
+  },
+  "distortion": {
+    "type": "utility",
+    "preset": "None (No Distortion)",
+    "dx": "0",
+    "dy": "0",
+    "dz": "0",
+    "strength": 0,
+    "region": "all",
+    "anchor": "none",
+    "space": "xyz"
+  }
+}
