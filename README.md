@@ -26,6 +26,9 @@ ZumoPi is a compact robot platform built around the Pololu Zumo chassis and cont
 - **[PathControl](https://docs.google.com/document/d/e/2PACX-1vTpQWTco3Bi_aDHO9klbxftK4g1yNk0Z4INCxaVdjpg8Rd_K-o5vXg43kFpY49FMV86XIksFvMH8WC9/pub)**  
   *Detailed instructions and theory on path planning and control algorithms, demonstrating how to implement robust path-following routines on the ZumoPi robot.*
 
+- **[PathControl - Python Simulation (PDF)](ZumoPi_V02/EducationalMaterials/ZumoPiV02%20-%20Autonomous%20Systems%20Lab%20-%20Path%20Control%20%28Python%29.pdf)**  
+  *Python edition of the Path Control lab: the pre-lab runs in the [Python path control simulator](ZumoPi_V02/Python_Simulation) (GUI with live gain tuning, 2D path and block diagram view) instead of MATLAB/Simulink. Setup instructions are in its [README](ZumoPi_V02/Python_Simulation/README.md).*
+
 - **[ImageProcessing](https://docs.google.com/document/d/e/2PACX-1vQhq_S6ipLvnca8L5krcB6jEdvge32izgGZujL72_1fmICjwPvxk8P4Rqf4jPIfgcK0uPkOjYD1Od2g/pub)**  
   *The Image Processing Lab provides comprehensive guidance and theoretical foundations for practical image processing techniques, demonstrating how to implement vision-based applications on the ZumoPi robot.*
 
