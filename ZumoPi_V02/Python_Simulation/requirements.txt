@@ -1,0 +1,5 @@
+# ZumoPi path control simulation - Python 3.10+ (tested with 3.14)
+# tkinter is part of the standard Python installer (python.org) - no pip package needed.
+numpy>=1.24
+scipy>=1.10        # only used to read the MATLAB reference .mat files (validation)
+matplotlib>=3.7
